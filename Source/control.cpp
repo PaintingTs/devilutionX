@@ -75,6 +75,9 @@ int8_t GoldDropInvIndex;
 std::optional<NumberInputState> GoldDropInputState;
 } // namespace
 
+// PD1:
+bool perksButtonPressed;
+
 bool chrbtn[4];
 bool lvlbtndown;
 bool chrbtnactive;
@@ -1285,6 +1288,14 @@ void CheckChrBtns()
 			chrbtnactive = true;
 		}
 	}
+
+	//PD1:
+	Rectangle perksButton = perksBtnRelativeRect;
+	perksButton.position = GetPanelPosition(UiPanels::Character, perksBtnRelativeRect.position);
+	if (perksButton.contains(MousePosition)) {
+		perksButtonPressed = true;
+		chrbtnactive = true;
+	}
 }
 
 void ReleaseChrBtns(bool addAllStatPoints)
@@ -1321,6 +1332,17 @@ void ReleaseChrBtns(bool addAllStatPoints)
 				myPlayer._pStatPts -= statPointsToAdd;
 				break;
 			}
+		}
+	}
+
+	//PD1:
+	if (perksButtonPressed){
+		perksButtonPressed = false;
+		Rectangle perksButton = perksBtnRelativeRect;
+		perksButton.position = GetPanelPosition(UiPanels::Character, perksBtnRelativeRect.position);
+		if (perksButton.contains(MousePosition)) {
+			// TODO: Run perks UI from here
+			InitDiabloMsg(EMSG_NO_MULTIPLAYER_IN_DEMO);
 		}
 	}
 }

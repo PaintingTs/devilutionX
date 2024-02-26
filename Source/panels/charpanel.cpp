@@ -12,6 +12,7 @@
 #include "engine/load_clx.hpp"
 #include "engine/render/clx_render.hpp"
 #include "engine/render/text_render.hpp"
+#include "engine/trn.hpp"
 #include "panels/ui_panels.hpp"
 #include "player.h"
 #include "playerdat.hpp"
@@ -265,6 +266,16 @@ void DrawStatButtons(const Surface &out)
 	}
 }
 
+//PD1
+void DrawPerksButton(const Surface &out)
+{
+	Point buttonPos = GetPanelPosition(UiPanels::Character, perksBtnRelativeRect.position);
+	if (perksButtonPressed)
+		ClxDrawTRN(out, buttonPos, (*pChrButtons)[0], GetStoneTRN());
+	else
+		ClxDraw(out, buttonPos, (*pChrButtons)[0]);
+}
+
 } // namespace
 
 void LoadCharPanel()
@@ -317,6 +328,7 @@ void DrawChr(const Surface &out)
 		}
 	}
 	DrawStatButtons(out);
+	DrawPerksButton(out);
 }
 
 } // namespace devilution

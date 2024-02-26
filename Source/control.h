@@ -43,6 +43,9 @@ extern bool dropGoldFlag;
 extern TextInputCursorState GoldDropCursor;
 extern char GoldDropText[21];
 
+//PD1
+extern bool perksButtonPressed;
+
 extern bool chrbtn[4];
 extern bool lvlbtndown;
 extern bool chrbtnactive;

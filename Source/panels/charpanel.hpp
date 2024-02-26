@@ -5,6 +5,8 @@
 
 namespace devilution {
 
+constexpr Rectangle perksBtnRelativeRect = {{ 16, 106 }, { 95, 22 }};
+
 extern OptionalOwnedClxSpriteList pChrButtons;
 
 void DrawChr(const Surface &);

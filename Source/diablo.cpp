@@ -311,7 +311,7 @@ bool TryOpenDungeonWithMouse()
 	if (holdItem.IDidx == IDI_RUNEBOMB && OpensHive(cursPosition))
 		OpenHive();
 	else if (holdItem.IDidx == IDI_MAPOFDOOM && OpensGrave(cursPosition))
-		OpenGrave();
+		OpenGrave();	// NOTE: logic for opening grave level here
 	else
 		return false;
 
@@ -319,7 +319,7 @@ bool TryOpenDungeonWithMouse()
 	return true;
 }
 
-void LeftMouseDown(uint16_t modState)
+void LeftMouseDown(uint16_t modState) //NOTE: Left-click down
 {
 	LastMouseButtonAction = MouseActionType::None;
 
@@ -401,7 +401,7 @@ void LeftMouseDown(uint16_t modState)
 	}
 }
 
-void LeftMouseUp(uint16_t modState)
+void LeftMouseUp(uint16_t modState)  //NOTE: Left-click up
 {
 	gmenu_left_mouse(false);
 	control_release_talk_btn();
