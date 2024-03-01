@@ -23,6 +23,8 @@
 #include "utils/str_cat.hpp"
 #include "utils/surface_to_clx.hpp"
 
+#include "pd1/perks_box.h"
+
 namespace devilution {
 
 OptionalOwnedClxSpriteList pChrButtons;
@@ -329,6 +331,9 @@ void DrawChr(const Surface &out)
 	}
 	DrawStatButtons(out);
 	DrawPerksButton(out);
+
+	if (PerksBoxIsOpen)
+		DrawPerksBox(out);
 }
 
 } // namespace devilution

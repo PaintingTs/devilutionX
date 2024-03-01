@@ -1578,7 +1578,7 @@ void DetectInputMethod(const SDL_Event &event, const ControllerButtonEvent &game
 	}
 }
 
-void ProcessGameAction(const GameAction &action)
+void ProcessGameAction(const GameAction &action)  // TODO: PD1 - check and add TOGGLE_PERKS_BOX
 {
 	switch (action.type) {
 	case GameActionType_NONE:

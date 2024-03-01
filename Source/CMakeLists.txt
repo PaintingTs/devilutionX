@@ -3,6 +3,8 @@ include(functions/devilutionx_library)
 include(functions/genex)
 
 set(libdevilutionx_SRCS
+  pd1/perks_box.cpp
+
   appfat.cpp
   automap.cpp
   capture.cpp

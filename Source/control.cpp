@@ -61,6 +61,8 @@
 #include "utils/string_or_view.hpp"
 #include "utils/utf8.hpp"
 
+#include "pd1/perks_box.h" // PD1
+
 #ifdef _DEBUG
 #include "debug.h"
 #endif
@@ -651,6 +653,8 @@ void RemoveGold(Player &player, int goldIndex, int amount)
 	player._pGold = CalculateGold(player);
 }
 
+
+// TODO: PD1 - Here we can show LvlUp button if we have some perks points left
 bool IsLevelUpButtonVisible()
 {
 	if (spselflag || chrflag || MyPlayer->_pStatPts == 0) {
@@ -739,6 +743,7 @@ void FocusOnCharInfo()
 void OpenCharPanel()
 {
 	QuestLogIsOpen = false;
+	PerksBoxIsOpen = false;  //PD1
 	CloseGoldWithdraw();
 	CloseStash();
 	chrflag = true;
@@ -746,6 +751,7 @@ void OpenCharPanel()
 
 void CloseCharPanel()
 {
+	PerksBoxIsOpen = false;  //PD1
 	chrflag = false;
 	if (IsInspectingPlayer()) {
 		InspectPlayer = MyPlayer;
@@ -756,6 +762,11 @@ void CloseCharPanel()
 
 void ToggleCharPanel()
 {
+	if (PerksBoxIsOpen) {  // PD1
+		PerksBoxIsOpen = false;
+		return;
+	}
+
 	if (chrflag)
 		CloseCharPanel();
 	else
@@ -1272,6 +1283,11 @@ void DrawLevelUpIcon(const Surface &out)
 
 void CheckChrBtns()
 {
+	if (PerksBoxIsOpen) { 		// PD1
+		CheckPerkBoxClick();
+		return;
+	}
+
 	Player &myPlayer = *MyPlayer;
 
 	if (chrbtnactive || myPlayer._pStatPts == 0)
@@ -1300,6 +1316,11 @@ void CheckChrBtns()
 
 void ReleaseChrBtns(bool addAllStatPoints)
 {
+	if (PerksBoxIsOpen) {  //PD1
+		CheckPerkBoxClick();
+		return;
+	}
+
 	chrbtnactive = false;
 	for (auto attribute : enum_values<CharacterAttribute>()) {
 		auto buttonId = static_cast<size_t>(attribute);
@@ -1335,14 +1356,14 @@ void ReleaseChrBtns(bool addAllStatPoints)
 		}
 	}
 
-	//PD1:
+	//PD1: handling Perks-box button click
 	if (perksButtonPressed){
 		perksButtonPressed = false;
 		Rectangle perksButton = perksBtnRelativeRect;
 		perksButton.position = GetPanelPosition(UiPanels::Character, perksBtnRelativeRect.position);
 		if (perksButton.contains(MousePosition)) {
-			// TODO: Run perks UI from here
-			InitDiabloMsg(EMSG_NO_MULTIPLAYER_IN_DEMO);
+			//InitDiabloMsg(EMSG_NO_MULTIPLAYER_IN_DEMO);
+			PerksBoxIsOpen = true;
 		}
 	}
 }
