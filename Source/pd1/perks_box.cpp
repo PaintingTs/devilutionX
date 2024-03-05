@@ -13,7 +13,7 @@ constexpr int fadeLevel = 4;
 // Two alternative ways to draw perks list
 void DrawListWithButtons(const Surface &out, Rectangle &rect);
 void DrawListWithPluses(const Surface &out, Rectangle &rect);
-unsigned int temp = 0;
+unsigned int temp = 1;
 
 void DrawPerksBox(const Surface &out)
 {
@@ -41,14 +41,16 @@ void DrawPerksBox(const Surface &out)
 
 
     // Drawing divider bottom ===========
-	out.BlitFrom(out, MakeSdlRect(dividerLineRect), dividerLineRect.position + Displacement { 0, 297 - 2 * 12 + 13 });  // 2 lines 12px each + margin (?)
+	out.BlitFrom(out, MakeSdlRect(dividerLineRect), dividerLineRect.position + Displacement { 0, 297 - (2 * 12 + 8) });
+    DrawString(out, _("Close"), { panelPos + Displacement { 35, 300 }, { 248, 0 } }, { .flags = UiFlags::AlignCenter | UiFlags::ColorWhite });
 
 }
 
 void CheckPerkBoxClick()
 {
     const Rectangle perksBox = { GetLeftPanel().position + Displacement { 24, 25 }, { 271, 303 } };
-    if (!perksBox.contains(MousePosition)) {   // Closing box when clicking on charpanel outside the box
+    const Rectangle closeButton = { GetLeftPanel().position + Displacement { 24, 293 }, { 248, 30 } };
+    if (!perksBox.contains(MousePosition) || closeButton.contains(MousePosition)) {   // Closing box when clicking on charpanel outside the box
         PerksBoxIsOpen = false;
         return;
     }
@@ -62,7 +64,7 @@ void DrawListWithButtons(const Surface &out, Rectangle &rect)
     rect.position.y += 40;
     //Test data:
     DrawString(out, "Quick learner [0/15]", rect, { .flags = UiFlags::ColorWhite });
-    ClxDraw(out, { rect.position.x + 207, rect.position.y + 18}, (*pChrButtons)[1]);  //example for light tables
+    ClxDrawTRN(out, { rect.position.x + 207, rect.position.y + 18}, (*pChrButtons)[1], LightTables[1].data());  //example for light tables
     rect.position.y += 24;
     DrawString(out, "Stone skin [1/15]", rect, { .flags = UiFlags::ColorBlue });
     ClxDrawTRN(out, { rect.position.x + 207, rect.position.y + 18}, (*pChrButtons)[1], LightTables[1].data());
@@ -80,6 +82,9 @@ void DrawListWithButtons(const Surface &out, Rectangle &rect)
     rect.position.y += 24;
     DrawString(out, "Necromancy [0/3]", rect, { .flags = UiFlags::ColorRed });
     DrawString(out, "Req: Lvl 33", rect, { .flags = UiFlags::ColorRed | UiFlags::AlignRight });
+    rect.position.y += 24;
+    DrawString(out, "Sword mastery [0/15]", rect, { .flags = UiFlags::ColorWhite });
+    ClxDrawTRN(out, { rect.position.x + 207, rect.position.y + 18}, (*pChrButtons)[1], LightTables[1].data());
 }
 
 void DrawListWithPluses(const Surface &out, Rectangle &rect)
@@ -105,6 +110,9 @@ void DrawListWithPluses(const Surface &out, Rectangle &rect)
     rect.position.y += 24;
     DrawString(out, "Necromancy [0/3]", rect, { .flags = UiFlags::ColorRed });
     DrawString(out, "Req: Lvl 33", rect, { .flags = UiFlags::ColorRed | UiFlags::AlignRight });
+    rect.position.y += 24;
+    DrawString(out, "Sword mastery [0/15]", rect, { .flags = UiFlags::ColorWhite });
+    DrawString(out, "+", rect, { .flags = UiFlags::ColorRed | UiFlags::AlignRight | UiFlags::FontSize30 });
 }
 
 }
