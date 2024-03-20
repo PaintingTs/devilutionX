@@ -3181,7 +3181,7 @@ size_t AddMonsterType(_monster_id type, placeflag placeflag)
 	return typeIndex;
 }
 
-void InitTRNForUniqueMonster(Monster &monster)
+void InitTRNForUniqueMonster(Monster &monster) // PD1 - trn for unique monsters
 {
 	char filestr[64];
 	*BufCopy(filestr, R"(monsters\monsters\)", UniqueMonstersData[static_cast<size_t>(monster.uniqueType)].mTrnName, ".trn") = '\0';
@@ -3300,6 +3300,7 @@ void InitLevelMonsters()
 void GetLevelMTypes()
 {
 	AddMonsterType(MT_GOLEM, PLACE_SPECIAL);
+	AddMonsterType(MT_XSKELAX, PLACE_SPECIAL); // PD1 - summoned skeleton
 	if (currlevel == 16) {
 		AddMonsterType(MT_ADVOCATE, PLACE_SCATTER);
 		AddMonsterType(MT_RBLACK, PLACE_SCATTER);
@@ -3538,11 +3539,16 @@ void WeakenNaKrul()
 	monster.maxHitPoints = hp;
 }
 
-void InitGolems()
+void InitGolems() // PD1 - TODO: rename to InitSummons()
 {
 	if (!setlevel) {
-		for (int i = 0; i < MAX_PLRS; i++)
+		for (int i = 0; i < MAX_PLRS; i++) {
 			AddMonster(GolemHoldingCell, Direction::South, 0, false);
+
+			// PD1 - init summoned skeletons - 2 units
+			AddMonster(GolemHoldingCell, Direction::South, 1, false); 
+			AddMonster(GolemHoldingCell, Direction::South, 1, false);
+		}
 	}
 }
 
@@ -3610,9 +3616,15 @@ void InitMonsters()
 void SetMapMonsters(const uint16_t *dunData, Point startPosition)
 {
 	AddMonsterType(MT_GOLEM, PLACE_SPECIAL);
+	AddMonsterType(MT_XSKELAX, PLACE_SPECIAL); // PD1 - summoned skeletons. WHY 2ND TIME???
 	if (setlevel)
-		for (int i = 0; i < MAX_PLRS; i++)
+		for (int i = 0; i < MAX_PLRS; i++) {
 			AddMonster(GolemHoldingCell, Direction::South, 0, false);
+
+			// PD1 - summoned skeletons. 2 units
+			AddMonster(GolemHoldingCell, Direction::South, 1, false); 
+			AddMonster(GolemHoldingCell, Direction::South, 1, false);
+		}
 
 	if (setlevel && setlvlnum == SL_VILEBETRAYER) {
 		AddMonsterType(UniqueMonsterType::Lazarus, PLACE_UNIQUE);
@@ -3862,7 +3874,7 @@ void StartMonsterDeath(Monster &monster, const Player &player, bool sendmsg)
 
 void KillMyGolem()
 {
-	Monster &golem = Monsters[MyPlayerId];
+	Monster &golem = Monsters[MyPlayerId]; // PD1: TODO: here is the stupid PlayerId -> Golem Monster_Index link 
 	delta_kill_monster(golem, golem.position.tile, *MyPlayer);
 	NetSendCmdLoc(MyPlayerId, false, CMD_KILLGOLEM, golem.position.tile);
 	M_StartKill(golem, *MyPlayer);
@@ -4002,7 +4014,7 @@ bool Walk(Monster &monster, Direction md)
 	return true;
 }
 
-void GolumAi(Monster &golem)
+void GolumAi(Monster &golem) // TODO: PD1 - golem AI
 {
 	if (golem.position.tile.x == 1 && golem.position.tile.y == 0) {
 		return;
@@ -4622,7 +4634,7 @@ void ActivateSkeleton(Monster &monster, Point position)
 	}
 }
 
-Monster *PreSpawnSkeleton()
+Monster *PreSpawnSkeleton() // PD1 - TODO: check this. IDEA: can we use Leoric skeleton spawn logic for summoned skels
 {
 	Monster *skeleton = AddSkeleton({ 0, 0 }, Direction::South, false);
 	if (skeleton != nullptr)
@@ -4824,7 +4836,7 @@ bool Monster::isResistant(MissileID missileType, DamageType missileElement) cons
 	return false;
 }
 
-bool Monster::isPlayerMinion() const
+bool Monster::isPlayerMinion() const  // TODO: PD1 check this one - interesting Minion flag
 {
 	return (flags & MFLAG_GOLEM) != 0 && (flags & MFLAG_BERSERK) == 0;
 }

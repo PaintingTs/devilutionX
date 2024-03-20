@@ -2969,7 +2969,7 @@ void LoadGameLevel(bool firstflag, lvl_entry lvldir)
 					DeltaLoadLevel();
 			} else {
 				HoldThemeRooms();
-				InitGolems();
+				InitGolems();		// PD1 - check golem logic
 				InitMonsters();
 				InitMissiles();
 				InitCorpses();

@@ -49,120 +49,120 @@ const _monster_id MonstConvTbl[] = {
 	MT_NZOMBIE,
 	MT_BZOMBIE,
 	MT_GZOMBIE,
-	MT_YZOMBIE,
+	MT_YZOMBIE,		// ^ zombies
 	MT_RFALLSP,
 	MT_DFALLSP,
 	MT_YFALLSP,
-	MT_BFALLSP,
+	MT_BFALLSP, 	// ^ fallens with spears?
 	MT_WSKELAX,
 	MT_TSKELAX,
 	MT_RSKELAX,
-	MT_XSKELAX,
+	MT_XSKELAX, 	// ^ axe skeletons
 	MT_RFALLSD,
 	MT_DFALLSD,
 	MT_YFALLSD,
-	MT_BFALLSD,
+	MT_BFALLSD, 	// ^ fallens with shields?
 	MT_NSCAV,
 	MT_BSCAV,
 	MT_WSCAV,
-	MT_YSCAV,
+	MT_YSCAV,   	// ^ scavangers
 	MT_WSKELBW,
 	MT_TSKELBW,
 	MT_RSKELBW,
-	MT_XSKELBW,
+	MT_XSKELBW, 	// ^ bow skeletons
 	MT_WSKELSD,
 	MT_TSKELSD,
 	MT_RSKELSD,
-	MT_XSKELSD,
+	MT_XSKELSD, 	// ^ shiled skeletons
 	MT_SNEAK,
 	MT_STALKER,
 	MT_UNSEEN,
-	MT_ILLWEAV,
+	MT_ILLWEAV, 	// ^ hiddens
 	MT_NGOATMC,
 	MT_BGOATMC,
 	MT_RGOATMC,
-	MT_GGOATMC,
+	MT_GGOATMC, 	// ^ mace goats
 	MT_FIEND,
 	MT_GLOOM,
 	MT_BLINK,
-	MT_FAMILIAR,
+	MT_FAMILIAR, 	// ^ small bats
 	MT_NGOATBW,
 	MT_BGOATBW,
 	MT_RGOATBW,
-	MT_GGOATBW,
+	MT_GGOATBW,  	// ^ bow goats
 	MT_NACID,
 	MT_RACID,
 	MT_BACID,
-	MT_XACID,
-	MT_SKING,
+	MT_XACID,  		// ^ acid spitter
+	MT_SKING,		// LEORIK
 	MT_FAT,
 	MT_MUDMAN,
 	MT_TOAD,
-	MT_FLAYED,
+	MT_FLAYED,		// ^ overloads
 	MT_WYRM,
 	MT_CAVSLUG,
 	MT_DEVOUR,
-	MT_DVLWYRM,
+	MT_DVLWYRM,		// ^ wyrm (unused??)
 	MT_NMAGMA,
 	MT_YMAGMA,
 	MT_BMAGMA,
-	MT_WMAGMA,
+	MT_WMAGMA,		// ^ magma demons
 	MT_HORNED,
 	MT_MUDRUN,
 	MT_FROSTC,
-	MT_OBLORD,
+	MT_OBLORD,		// ^ horned demons
 	MT_BONEDMN,
 	MT_REDDTH,
 	MT_LTCHDMN,
-	MT_UDEDBLRG,
+	MT_UDEDBLRG,    // ^ Demon undead (giant skeleton)
 	MT_INVALID,
 	MT_INVALID,
 	MT_INVALID,
 	MT_INVALID,
-	MT_INCIN,
+	MT_INCIN,		// --
 	MT_FLAMLRD,
 	MT_DOOMFIRE,
-	MT_HELLBURN,
+	MT_HELLBURN,	// ^ unused elemental
 	MT_INVALID,
 	MT_INVALID,
 	MT_INVALID,
 	MT_INVALID,
-	MT_RSTORM,
+	MT_RSTORM,		// ---
 	MT_STORM,
 	MT_STORML,
-	MT_MAEL,
+	MT_MAEL,		// ^ storm demon
 	MT_WINGED,
 	MT_GARGOYLE,
 	MT_BLOODCLW,
-	MT_DEATHW,
+	MT_DEATHW,		// ^ gargoyles
 	MT_MEGA,
 	MT_GUARD,
 	MT_VTEXLRD,
-	MT_BALROG,
+	MT_BALROG,		// ^ balrogs
 	MT_NSNAKE,
 	MT_RSNAKE,
 	MT_GSNAKE,
-	MT_BSNAKE,
+	MT_BSNAKE,		// ^ hell-snakes
 	MT_NBLACK,
 	MT_RTBLACK,
 	MT_BTBLACK,
-	MT_RBLACK,
+	MT_RBLACK,		// ^ knights
 	MT_UNRAV,
-	MT_HOLOWONE,
+	MT_HOLOWONE,	// ^ unravs
 	MT_PAINMSTR,
-	MT_REALWEAV,
+	MT_REALWEAV, 	// ^ 2-head hiddens 
 	MT_SUCCUBUS,
 	MT_SNOWWICH,
 	MT_HLSPWN,
-	MT_SOLBRNR,
+	MT_SOLBRNR,		// ^ succubus
 	MT_COUNSLR,
 	MT_MAGISTR,
 	MT_CABALIST,
-	MT_ADVOCATE,
+	MT_ADVOCATE,	// ^ mages
 	MT_INVALID,
-	MT_DIABLO,
+	MT_DIABLO,		// diablo
 	MT_INVALID,
-	MT_GOLEM,
+	MT_GOLEM,		// golem
 	MT_INVALID,
 	MT_INVALID,
 	MT_INVALID, // Monster from blood1.dun and blood2.dun
@@ -176,12 +176,12 @@ const _monster_id MonstConvTbl[] = {
 	MT_DARKMAGE,
 	MT_HELLBOAR,
 	MT_STINGER,
-	MT_PSYCHORB,
+	MT_PSYCHORB,	// flying orb 1
 	MT_ARACHNON,
 	MT_FELLTWIN,
 	MT_HORKSPWN,
 	MT_VENMTAIL,
-	MT_NECRMORB,
+	MT_NECRMORB,	// flying orb 2
 	MT_SPIDLORD,
 	MT_LASHWORM,
 	MT_TORCHANT,
@@ -192,17 +192,17 @@ const _monster_id MonstConvTbl[] = {
 	MT_FIREBAT,
 	MT_SKLWING,
 	MT_LICH,
-	MT_CRYPTDMN,
+	MT_CRYPTDMN,	// crypt demon (stone / obsidian one)
 	MT_HELLBAT,
 	MT_BONEDEMN,
 	MT_LICH,
 	MT_BICLOPS,
 	MT_FLESTHNG,
-	MT_REAPER,
+	MT_REAPER,		// reaper (crypt)
 	MT_NAKRUL,
 	MT_CLEAVER,
 	MT_INVILORD,
-	MT_LRDSAYTR,
+	MT_LRDSAYTR,		// satyr lord
 };
 
 namespace {

@@ -785,7 +785,7 @@ bool IsMissileBlockedByTile(Point tile)
 	return object != nullptr && !object->_oMissFlag;
 }
 
-DamageRange GetDamageAmt(SpellID spell, int spellLevel)
+DamageRange GetDamageAmt(SpellID spell, int spellLevel) // TODO: PD1 spell damage table
 {
 	assert(MyPlayer != nullptr);
 	assert(spell >= SpellID::FIRST && spell <= SpellID::LAST);
@@ -2289,7 +2289,7 @@ void AddStoneCurse(Missile &missile, AddMissileParameter &parameter)
 
 		    auto &monster = Monsters[monsterId];
 
-		    if (IsAnyOf(monster.type().type, MT_GOLEM, MT_DIABLO, MT_NAKRUL)) {
+		    if (IsAnyOf(monster.type().type, MT_GOLEM, MT_DIABLO, MT_NAKRUL)) { // TODO: PD1 - stone cures should not work with summoned minions
 			    return false;
 		    }
 		    if (IsAnyOf(monster.mode, MonsterMode::FadeIn, MonsterMode::FadeOut, MonsterMode::Charge)) {
@@ -2330,7 +2330,7 @@ void AddStoneCurse(Missile &missile, AddMissileParameter &parameter)
 	missile._mirange <<= 4;
 }
 
-void AddGolem(Missile &missile, AddMissileParameter &parameter)
+void AddGolem(Missile &missile, AddMissileParameter &parameter) // PD1: TODO: check golem missile
 {
 	missile._miDelFlag = true;
 
