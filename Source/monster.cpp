@@ -149,6 +149,12 @@ void InitMonster(Monster &monster, Direction rd, size_t typeIndex, Point positio
 	monster.animInfo.tickCounterOfCurrentFrame = GenerateRnd(monster.animInfo.ticksPerFrame - 1);
 	monster.animInfo.currentFrame = GenerateRnd(monster.animInfo.numberOfFrames - 1);
 
+	
+	//pd1 temp
+	if (typeIndex == 1)
+		Log("SUMMON SKEL TYPE: {}", monster.data().name);
+	//pd1 temp
+
 	int maxhp = monster.data().hitPointsMinimum + GenerateRnd(monster.data().hitPointsMaximum - monster.data().hitPointsMinimum + 1);
 	if (monster.type().type == MT_DIABLO && !gbIsHellfire) {
 		maxhp /= 2;
@@ -2979,7 +2985,7 @@ void ActivateSpawn(Monster &monster, Point position, Direction dir)
 }
 
 /** Maps from monster AI ID to monster AI function. */
-void (*AiProc[])(Monster &monster) = {
+void (*AiProc[])(Monster &monster) = {					// PD1 idea: add custom AI here for summons, we can set-up this AI during summon spawn
 	/*MonsterAIID::Zombie         */ &ZombieAi,
 	/*MonsterAIID::Fat            */ &OverlordAi,
 	/*MonsterAIID::SkeletonMelee  */ &SkeletonAi,
@@ -3300,7 +3306,7 @@ void InitLevelMonsters()
 void GetLevelMTypes()
 {
 	AddMonsterType(MT_GOLEM, PLACE_SPECIAL);
-	AddMonsterType(MT_XSKELAX, PLACE_SPECIAL); // PD1 - summoned skeleton
+	AddMonsterType(MT_WSKELAX, PLACE_SPECIAL); // PD1 - summoned skeleton
 	if (currlevel == 16) {
 		AddMonsterType(MT_ADVOCATE, PLACE_SCATTER);
 		AddMonsterType(MT_RBLACK, PLACE_SCATTER);
@@ -3616,14 +3622,14 @@ void InitMonsters()
 void SetMapMonsters(const uint16_t *dunData, Point startPosition)
 {
 	AddMonsterType(MT_GOLEM, PLACE_SPECIAL);
-	AddMonsterType(MT_XSKELAX, PLACE_SPECIAL); // PD1 - summoned skeletons. WHY 2ND TIME???
+	AddMonsterType(MT_WSKELAX, PLACE_SPECIAL); // PD1 - summoned skeletons. WHY 2ND TIME???
 	if (setlevel)
 		for (int i = 0; i < MAX_PLRS; i++) {
 			AddMonster(GolemHoldingCell, Direction::South, 0, false);
 
 			// PD1 - summoned skeletons. 2 units
-			AddMonster(GolemHoldingCell, Direction::South, 1, false); 
-			AddMonster(GolemHoldingCell, Direction::South, 1, false);
+			AddMonster(GolemHoldingCell, Direction::West, 1, false); 
+			AddMonster(GolemHoldingCell, Direction::East, 1, false);
 		}
 
 	if (setlevel && setlvlnum == SL_VILEBETRAYER) {
@@ -3874,10 +3880,18 @@ void StartMonsterDeath(Monster &monster, const Player &player, bool sendmsg)
 
 void KillMyGolem()
 {
-	Monster &golem = Monsters[MyPlayerId]; // PD1: TODO: here is the stupid PlayerId -> Golem Monster_Index link 
+	Monster &golem = Monsters[MyPlayerId];
 	delta_kill_monster(golem, golem.position.tile, *MyPlayer);
 	NetSendCmdLoc(MyPlayerId, false, CMD_KILLGOLEM, golem.position.tile);
 	M_StartKill(golem, *MyPlayer);
+}
+
+// PD1
+void KillMySummonedSkeleton(Monster& skel)
+{
+	delta_kill_monster(skel, skel.position.tile, *MyPlayer);
+	NetSendCmdLoc(MyPlayerId, false, CMD_MONSTDEATH, skel.position.tile);
+	M_StartKill(skel, *MyPlayer);
 }
 
 void M_StartKill(Monster &monster, const Player &player)
@@ -4722,6 +4736,37 @@ void SpawnGolem(Player &player, Monster &golem, Point position, Missile &missile
 		    golem.enemy,
 		    golem.hitPoints,
 		    GetLevelForMultiplayer(player));
+	}
+}
+
+// PD1:
+void SpawnSkeletonSummon(Player &player, Monster &skel, Point position, Missile &missile)
+{
+	skel.occupyTile(position, false);
+	skel.position.tile = position;
+	skel.position.future = position;
+	skel.position.old = position;
+	skel.pathCount = 0;
+	skel.maxHitPoints = 2 * (320 * missile._mispllvl + player._pMaxMana / 3);
+	skel.hitPoints = skel.maxHitPoints;
+	skel.armorClass = 25;
+	skel.toHit = 5 * (missile._mispllvl + 8) + 2 * player.getCharacterLevel();
+	skel.minDamage = 2 * (missile._mispllvl + 4);
+	skel.maxDamage = 2 * (missile._mispllvl + 8);
+	skel.flags |= MFLAG_GOLEM;
+
+	skel.ai = MonsterAIID::SkeletonMelee; // TODO: add custom AI here
+
+	StartSpecialStand(skel, Direction::West);
+	UpdateEnemy(skel);
+	if (&player == MyPlayer) {
+		/* NetSendCmdGolem(             //TODO: differnt type of command
+		    skel.position.tile.x,
+		    skel.position.tile.y,
+		    skel.direction,
+		    skel.enemy,
+		    skel.hitPoints,
+		    GetLevelForMultiplayer(player)); */
 	}
 }
 

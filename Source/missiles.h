@@ -346,6 +346,9 @@ void AddApocalypseBoom(Missile &missile, AddMissileParameter &parameter);
 void AddHealing(Missile &missile, AddMissileParameter &parameter);
 void AddHealOther(Missile &missile, AddMissileParameter &parameter);
 
+//PD1:
+void AddSkeletonSummon(Missile &missile, AddMissileParameter &parameter);
+
 /**
  * var1: X coordinate of the missile-light
  * var2: Y coordinate of the missile-light
