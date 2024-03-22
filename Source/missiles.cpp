@@ -2330,7 +2330,7 @@ void AddStoneCurse(Missile &missile, AddMissileParameter &parameter)
 	missile._mirange <<= 4;
 }
 
-void AddGolem(Missile &missile, AddMissileParameter &parameter) // PD1: TODO: check golem missile
+void AddGolem(Missile &missile, AddMissileParameter &parameter)
 {
 	missile._miDelFlag = true;
 
@@ -2348,7 +2348,7 @@ void AddGolem(Missile &missile, AddMissileParameter &parameter) // PD1: TODO: ch
 		    },
 		    parameter.dst, 0, 5);
 
-		if (spawnPosition) {
+		if (spawnPosition) { // PD1: BUG? If there is no valid tile, golem will not be spawned, but previous will be killed :(
 			SpawnGolem(player, golem, *spawnPosition, missile);
 		}
 	}
