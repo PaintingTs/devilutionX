@@ -1256,7 +1256,7 @@ void AddBerserk(Missile &missile, AddMissileParameter &parameter)
 		monster.minDamageSpecial = (GenerateRnd(10) + 120) * monster.minDamageSpecial / 100 + slvl;
 		monster.maxDamageSpecial = (GenerateRnd(10) + 120) * monster.maxDamageSpecial / 100 + slvl;
 		int lightRadius = leveltype == DTYPE_NEST ? 9 : 3;
-		monster.lightId = AddLight(monster.position.tile, lightRadius);
+		monster.lightId = AddLight(monster.position.tile, lightRadius);  //PD1 idea: summons always have light radius, so no infravision needed to se them
 		parameter.spellFizzled = false;
 	}
 }

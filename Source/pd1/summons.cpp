@@ -8,6 +8,8 @@
 #include "monstdat.h"
 #include "player.h"
 
+#define MAX_SKELETONS 3
+
 namespace devilution {
 
 // TODO: temporary solution to not bother with resource files
@@ -63,6 +65,7 @@ void SpawnSkeletonSummon(Player &player, Monster &skel, Point position, Missile 
 	skel.flags |= MFLAG_GOLEM;
 
 	skel.ai = MonsterAIID::SkeletonMelee; // TODO: add custom AI here
+	// skel.ai = MonsterAIID::Golem;
 
     OnSummonSpawn(skel, static_cast<Direction>(SkeletonSpawningSlot[player.getId()] % 8));
 
@@ -86,7 +89,7 @@ void KillMySummonedSkeleton(Monster& skel)
 
 Monster& GetSkeletonSummon(int skeletonIndex, int playerId) // skeleton index among skeleton summons
 {
-    int monsterIndex = (skeletonIndex + 1) * MAX_PLRS + playerId;  // + 1 to skip golems
+    int monsterIndex = playerId * (1 + MAX_SKELETONS) + 1 + skeletonIndex;  // + 1 to skip golems
     Monster& skeleton =  Monsters[monsterIndex];
     return skeleton;
 }
@@ -98,7 +101,7 @@ void AddSkeletonSummon(Missile &missile, AddMissileParameter &parameter)
 	int playerId = missile._misource;
 	Player &player = Players[playerId];
 
-    int maxSkeletons =  std::min(missile._mispllvl + 1, 3); // TODO: to balance team
+    int maxSkeletons =  std::min(missile._mispllvl + 1, MAX_SKELETONS); // TODO: to balance team
 
     std::optional<Point> spawnPosition = FindClosestValidPosition(
 		[start = missile.position.start](Point target) {
@@ -113,11 +116,18 @@ void AddSkeletonSummon(Missile &missile, AddMissileParameter &parameter)
         if (skeleton.position.tile != GolemHoldingCell && &player == MyPlayer)
 		    KillMySummonedSkeleton(skeleton);
 
-		SpawnSkeletonSummon(player, skeleton, *spawnPosition, missile);
-	}
+		// TODO: we can have +1 skeleton to represent dying/death one. So in this line we can increment SkeletonSpawningSlot
+		// Notice: For Golem spell, second cast de-spawn the golem. It might be useful, but we don't have an option to de-spawn all skeletons right now
+		//		   Although we can manually kill them using attacking spells or melee damage(?)	 
 
-    if (++SkeletonSpawningSlot[playerId] == maxSkeletons)
-        SkeletonSpawningSlot[playerId] = 0;
+		if (skeleton.position.tile == GolemHoldingCell) {
+			SpawnSkeletonSummon(player, skeleton, *spawnPosition, missile);
+
+			if (++SkeletonSpawningSlot[playerId] == maxSkeletons)
+				SkeletonSpawningSlot[playerId] = 0;
+		}
+
+	}
 }
 
 }

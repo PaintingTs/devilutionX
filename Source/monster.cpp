@@ -3181,7 +3181,7 @@ size_t AddMonsterType(_monster_id type, placeflag placeflag)
 	return typeIndex;
 }
 
-void InitTRNForUniqueMonster(Monster &monster) // PD1 - trn for unique monsters
+void InitTRNForUniqueMonster(Monster &monster) // PD1 notice: trn for unique monsters, can be used for summons
 {
 	char filestr[64];
 	*BufCopy(filestr, R"(monsters\monsters\)", UniqueMonstersData[static_cast<size_t>(monster.uniqueType)].mTrnName, ".trn") = '\0';
@@ -3548,6 +3548,7 @@ void InitGolems() // PD1 - TODO: rename to InitSummons()
 			// PD1 - init summoned skeletons - 2 units
 			AddMonster(GolemHoldingCell, Direction::South, 1, false); 
 			AddMonster(GolemHoldingCell, Direction::South, 1, false);
+			AddMonster(GolemHoldingCell, Direction::South, 1, false);
 		}
 	}
 }
@@ -3622,8 +3623,9 @@ void SetMapMonsters(const uint16_t *dunData, Point startPosition)
 			AddMonster(GolemHoldingCell, Direction::South, 0, false);
 
 			// PD1 - summoned skeletons. 2 units
-			AddMonster(GolemHoldingCell, Direction::West, 1, false); 
-			AddMonster(GolemHoldingCell, Direction::East, 1, false);
+			AddMonster(GolemHoldingCell, Direction::South, 1, false); 
+			AddMonster(GolemHoldingCell, Direction::South, 1, false);
+			AddMonster(GolemHoldingCell, Direction::South, 1, false);
 		}
 
 	if (setlevel && setlvlnum == SL_VILEBETRAYER) {
