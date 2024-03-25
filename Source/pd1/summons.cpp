@@ -33,7 +33,7 @@ constexpr std::array<uint8_t, 256> SkeletonTrn = []() constexpr
 
 const uint8_t* GetSummonTrnOrNull(const Monster &monster, int lightTableIndex)
 {
-    if (monster.isPlayerMinion() && monster.type().type == MT_XSKELAX) {
+    if (monster.isPlayerMinion() && monster.type().type == MT_RSKELAX) {
         if (lightTableIndex > 6)
             return GetPauseTRN();
 

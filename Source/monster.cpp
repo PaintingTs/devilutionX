@@ -3300,7 +3300,7 @@ void InitLevelMonsters()
 void GetLevelMTypes()
 {
 	AddMonsterType(MT_GOLEM, PLACE_SPECIAL);
-	AddMonsterType(MT_XSKELAX, PLACE_SPECIAL); // PD1 - summoned skeleton
+	AddMonsterType(MT_RSKELAX, PLACE_SPECIAL); // PD1 - summoned skeleton
 	if (currlevel == 16) {
 		AddMonsterType(MT_ADVOCATE, PLACE_SCATTER);
 		AddMonsterType(MT_RBLACK, PLACE_SCATTER);
@@ -3616,7 +3616,7 @@ void InitMonsters()
 void SetMapMonsters(const uint16_t *dunData, Point startPosition)
 {
 	AddMonsterType(MT_GOLEM, PLACE_SPECIAL);
-	AddMonsterType(MT_XSKELAX, PLACE_SPECIAL); // PD1 - summoned skeletons. WHY 2ND TIME???
+	AddMonsterType(MT_RSKELAX, PLACE_SPECIAL); // PD1 - summoned skeletons. WHY 2ND TIME???
 	if (setlevel)
 		for (int i = 0; i < MAX_PLRS; i++) {
 			AddMonster(GolemHoldingCell, Direction::South, 0, false);
