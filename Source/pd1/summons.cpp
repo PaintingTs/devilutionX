@@ -67,7 +67,11 @@ void SpawnSkeletonSummon(Player &player, Monster &skel, Point position, Missile 
 	skel.ai = MonsterAIID::SkeletonMelee; // TODO: add custom AI here
 	// skel.ai = MonsterAIID::Golem;
 
-    OnSummonSpawn(skel, static_cast<Direction>(SkeletonSpawningSlot[player.getId()] % 8));
+	// TODO: I have a feeling that after being hit, skeleton starts to use GolumAI - check this theory.
+	// 		 Actualy if we'll have a lash for golem, we can use it's AI for melee summons.
+	//		 It will not work for ranged summons though.
+
+    OnSummonSpawn(skel, static_cast<Direction>((SkeletonSpawningSlot[player.getId()] + 1) % 8)); // scrolling through directions for next spawned skeleton
 
 	if (&player == MyPlayer) {
 		/* NetSendCmdGolem(             //TODO: differnt type of command
