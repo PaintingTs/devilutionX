@@ -2354,34 +2354,6 @@ void AddGolem(Missile &missile, AddMissileParameter &parameter)
 	}
 }
 
-//PD1
-void AddSkeletonSummon(Missile &missile, AddMissileParameter &parameter)
-{
-	missile._miDelFlag = true;
-
-	int playerId = missile._misource;
-	Player &player = Players[playerId];
-	Monster &skeleton1 = Monsters[MAX_PLRS + playerId];
-	Monster &skeleton2 = Monsters[2 * MAX_PLRS + playerId];
-
-	if (skeleton1.position.tile != GolemHoldingCell && skeleton2.position.tile != GolemHoldingCell && &player == MyPlayer) {
-		KillMySummonedSkeleton(skeleton1);
-		std::swap(skeleton1, skeleton2);
-	}
-
-	Monster &toSpawn =	skeleton1.position.tile == GolemHoldingCell ? skeleton1 : skeleton2;
-
-	std::optional<Point> spawnPosition = FindClosestValidPosition(
-		[start = missile.position.start](Point target) {
-			return !IsTileOccupied(target) && LineClearMissile(start, target);
-		},
-		parameter.dst, 0, 5);
-
-	if (spawnPosition) {
-		SpawnSkeletonSummon(player, toSpawn, *spawnPosition, missile);
-	}
-}
-
 void AddApocalypseBoom(Missile &missile, AddMissileParameter &parameter)
 {
 	missile.position.tile = parameter.dst;

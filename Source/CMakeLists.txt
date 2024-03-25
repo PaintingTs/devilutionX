@@ -175,6 +175,8 @@ set(libdevilutionx_SRCS
   storm/storm_net.cpp
   storm/storm_svid.cpp
 
+  pd1/summons.cpp
+
   utils/cel_to_clx.cpp
   utils/cl2_to_clx.cpp
   utils/console.cpp

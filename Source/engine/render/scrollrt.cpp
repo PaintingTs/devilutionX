@@ -63,6 +63,8 @@
 #include "utils/format_int.hpp"
 #endif
 
+#include "pd1/summons.h"
+
 namespace devilution {
 
 /**
@@ -314,7 +316,7 @@ void DrawMonster(const Surface &out, Point tilePosition, Point targetBufferPosit
 		ClxDrawTRN(out, targetBufferPosition, sprite, GetInfravisionTRN());
 		return;
 	}
-	uint8_t *trn = nullptr;
+	const uint8_t *trn = nullptr;
 	if (monster.isUnique())
 		trn = monster.uniqueMonsterTRN.get();
 	if (monster.mode == MonsterMode::Petrified)
@@ -323,8 +325,8 @@ void DrawMonster(const Surface &out, Point tilePosition, Point targetBufferPosit
 		trn = GetInfravisionTRN();
 
 	// PD1: Infravision for players summons (minions)
-	if (monster.isPlayerMinion() && LightTableIndex > 7)
-		trn = GetPauseTRN();
+	if (monster.isPlayerMinion())
+		trn = GetSummonTrnOrNull(monster, LightTableIndex);
 	// PD1 end
 
 	if (trn != nullptr)

@@ -563,8 +563,7 @@ bool CanTalkToMonst(const Monster &monster);
 int encode_enemy(Monster &monster);
 void decode_enemy(Monster &monster, int enemyId);
 
-//PD1:
-void SpawnSkeletonSummon(Player &player, Monster &skel, Point position, Missile &missile);
-void KillMySummonedSkeleton(Monster& skel);
+//PD1: exposing some of the functionality for summons
+void OnSummonSpawn(Monster &monster, Direction md);
 
 } // namespace devilution

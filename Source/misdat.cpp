@@ -25,6 +25,8 @@
 #include "engine/load_cl2.hpp"
 #endif
 
+#include "pd1/summons.h"
+
 namespace devilution {
 
 namespace {
