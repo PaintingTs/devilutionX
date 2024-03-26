@@ -730,11 +730,11 @@ void DrawDungeon(const Surface &out, Point tilePosition, Point targetBufferPosit
 	}
 
 	if (LightTableIndex < LightsMax && bDead != 0) {
-		const Corpse &corpse = Corpses[(bDead & 0x1F) - 1];
+		const Corpse &corpse = Corpses[(bDead & 0x1F) - 1];  // PD1: here is the assert when I try to use unique TRNs
 		const Point position { targetBufferPosition.x - CalculateWidth2(corpse.width), targetBufferPosition.y };
 		const ClxSprite sprite = corpse.spritesForDirection(static_cast<Direction>((bDead >> 5) & 7))[corpse.frame];
 		if (corpse.translationPaletteIndex != 0) {
-			const uint8_t *trn = Monsters[corpse.translationPaletteIndex - 1].uniqueMonsterTRN.get();
+			const uint8_t *trn = Monsters[corpse.translationPaletteIndex - 1].uniqueMonsterTRN.get();  // PD1: here is UniqueTRN read
 			ClxDrawTRN(out, position, sprite, trn);
 		} else {
 			ClxDrawLight(out, position, sprite);

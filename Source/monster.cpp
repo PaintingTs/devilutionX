@@ -4636,7 +4636,7 @@ void ActivateSkeleton(Monster &monster, Point position)
 	}
 }
 
-Monster *PreSpawnSkeleton() // PD1 - TODO: check this. IDEA: can we use Leoric skeleton spawn logic for summoned skels
+Monster *PreSpawnSkeleton()
 {
 	Monster *skeleton = AddSkeleton({ 0, 0 }, Direction::South, false);
 	if (skeleton != nullptr)

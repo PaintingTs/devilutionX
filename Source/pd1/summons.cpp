@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <memory>
 
 #include "engine/path.h"
 #include "engine/trn.hpp"
@@ -19,16 +20,16 @@ constexpr std::array<uint8_t, 256> SkeletonTrn = []() constexpr
     for (unsigned i = 0; i < 256; ++i)
         arr[i] = static_cast<uint8_t>(i);
 
-    for (unsigned i = 0xA1; i <= 0xAF; ++i) // A1-AF => F0-FE
-        arr[i] += 0x50 - 1;
+    for (unsigned i = 0xA1; i <= 0xAE; ++i) // A1-AF => F0-FE
+        arr[i] += 0x50;
 
     for (unsigned i = 0xD0; i <= 0xDF; ++i) // D0-DF => C0-CF probably not needed
         arr[i] -= 0x10;
 
-    for (unsigned i = 0xE0; i <= 0xEF; ++i) // E0-EF => F0-FF probably not needed
-        arr[i] += 0x10;
+    for (unsigned i = 0xE0; i <= 0xEE; ++i) // E0-EF => F0-FF probably not needed
+        arr[i] += 0x10 + 1;
     
-    arr[0xEF] = arr[0xFF] = 0;
+    arr[0xEF] = arr[0xFF] = arr[0xAF] = 0;
     return arr;
 }();
 
@@ -56,7 +57,7 @@ void SpawnSkeletonSummon(Player &player, Monster &skel, Point position, Missile 
 	skel.position.future = position;
 	skel.position.old = position;
 	skel.pathCount = 0;
-	skel.maxHitPoints = 2 * (320 * missile._mispllvl + player._pMaxMana / 3);
+	skel.maxHitPoints = 2 * (100 * missile._mispllvl + player._pMaxMana / 3);
 	skel.hitPoints = skel.maxHitPoints;
 	skel.armorClass = 25;
 	skel.toHit = 5 * (missile._mispllvl + 8) + 2 * player.getCharacterLevel();
@@ -64,7 +65,13 @@ void SpawnSkeletonSummon(Player &player, Monster &skel, Point position, Missile 
 	skel.maxDamage = 2 * (missile._mispllvl + 8);
 	skel.flags |= MFLAG_GOLEM;
 
-	skel.ai = MonsterAIID::SkeletonMelee; // TODO: add custom AI here
+	// visual apperiance
+	//skel.uniqueType = UniqueMonsterType::HorkDemon; //static_cast<UniqueMonsterType>(std::numeric_limits<uint8_t>::max() - 1);
+	//skel.uniqueMonsterTRN = std::make_unique<uint8_t[]>(256); //TODO: this code should be done only once when initializing a monster
+	//std::copy(SkeletonTrn.begin(), SkeletonTrn.end(), skel.uniqueMonsterTRN.get());
+
+	// AI
+	skel.ai = MonsterAIID::SkeletonRanged; // TODO: add custom AI here
 	// skel.ai = MonsterAIID::Golem;
 
 	// TODO: I have a feeling that after being hit, skeleton starts to use GolumAI - check this theory.
