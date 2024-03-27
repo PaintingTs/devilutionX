@@ -263,7 +263,7 @@ bool MonsterMHit(const Player &player, int monsterId, int mindam, int maxdam, in
 	if (monster.hitPoints >> 6 <= 0) {
 		M_StartKill(monster, player);
 	} else if (resist) {
-		monster.tag(player);
+		monster.tag(player);  // PD1 : todo monster should be tagged if attacked by another ranged monster
 		PlayEffect(monster, MonsterSound::Hit);
 	} else {
 		if (monster.mode != MonsterMode::Petrified && missileData.isArrow() && HasAnyOf(player._pIFlags, ItemSpecialEffect::Knockback))
@@ -662,7 +662,7 @@ bool CheckIfTrig(Point position)
 	return false;
 }
 
-bool GuardianTryFireAt(Missile &missile, Point target)
+bool GuardianTryFireAt(Missile &missile, Point target) // PD1 check Guardian spell for non-friendly-fire missiles!
 {
 	Point position = missile.position.tile;
 

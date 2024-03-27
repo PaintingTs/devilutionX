@@ -1285,7 +1285,7 @@ bool MonsterRangedAttack(Monster &monster)
 				    monster.enemyPosition,
 				    monster.direction,
 				    missileType,
-				    TARGET_PLAYERS,
+				    TARGET_PLAYERS, // monster.isPlayerMinion() ? TARGET_MONSTERS : TARGET_PLAYERS,  // PD1 will crash
 				    monster,
 				    monster.var2,
 				    0);
