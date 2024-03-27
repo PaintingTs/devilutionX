@@ -9,7 +9,10 @@
 #include "monstdat.h"
 #include "player.h"
 
+#include "utils/log.hpp"
+
 #define MAX_SKELETONS 3
+#define SKELETON_TYPE_INDEX 1
 
 namespace devilution {
 
@@ -26,7 +29,7 @@ constexpr std::array<uint8_t, 256> SkeletonTrn = []() constexpr
     for (unsigned i = 0xD0; i <= 0xDF; ++i) // D0-DF => C0-CF probably not needed
         arr[i] -= 0x10;
 
-    for (unsigned i = 0xE0; i <= 0xEE; ++i) // E0-EF => F0-FF probably not needed
+    for (unsigned i = 0xE0; i <= 0xED; ++i) // E0-EF => F0-FF probably not needed
         arr[i] += 0x10 + 1;
     
     arr[0xEF] = arr[0xFF] = arr[0xAF] = 0;
@@ -34,10 +37,29 @@ constexpr std::array<uint8_t, 256> SkeletonTrn = []() constexpr
 }();
 
 
+size_t GetSummonOwnerId(size_t summonId)
+{
+	if (summonId < MAX_PLRS)
+		return summonId;
+
+	if (summonId < MAX_PLRS * (MAX_SKELETONS + 1))
+		return (summonId - MAX_PLRS) / MAX_SKELETONS; // example: g0 g1 g2 g3 s0 s0 s0 s1 s1 s1 s2 s2 s2
+
+	assert("Unreachable");
+	return 0;
+}
+
+void InitSkeletonSummons()
+{
+	for (int i = 0; i < MAX_PLRS * MAX_SKELETONS; i++) 
+		AddMonster(GolemHoldingCell, Direction::South, SKELETON_TYPE_INDEX, false); 
+
+} 
+
 const uint8_t* GetSummonTrnOrNull(const Monster &monster, int lightTableIndex)
 {
-    if (monster.isPlayerMinion() && monster.type().type == MT_RSKELAX) {
-        if (lightTableIndex > 6)
+    if (monster.isPlayerMinion() && monster.type().type == SKELETON_MINION_TYPE) {
+        if (lightTableIndex > 7)
             return GetPauseTRN();
 
         return SkeletonTrn.data();
@@ -46,6 +68,11 @@ const uint8_t* GetSummonTrnOrNull(const Monster &monster, int lightTableIndex)
     return nullptr;
 }
 
+//NOTICE: looks like all the corpses of the same type are references to single item in Corpses array
+//		  for unique monsters there are additional slots, but total Corpses length must be <= 31, i.e.
+//		  monster_types_on_level + uniques_on_level <= 31.
+//
+//Solution: we can (present Summons as unique monsters OR add another monster types for summons) AND increase Corpses array size to accomondate this
 
 int SkeletonSpawningSlot[MAX_PLRS] = {0};
 
@@ -65,17 +92,14 @@ void SpawnSkeletonSummon(Player &player, Monster &skel, Point position, Missile 
 	skel.maxDamage = 2 * (missile._mispllvl + 8);
 	skel.flags |= MFLAG_GOLEM;
 
-	// visual apperiance
-	//skel.uniqueType = UniqueMonsterType::HorkDemon; //static_cast<UniqueMonsterType>(std::numeric_limits<uint8_t>::max() - 1);
-	//skel.uniqueMonsterTRN = std::make_unique<uint8_t[]>(256); //TODO: this code should be done only once when initializing a monster
-	//std::copy(SkeletonTrn.begin(), SkeletonTrn.end(), skel.uniqueMonsterTRN.get());
+	// visual apperiance (might be usfull later)
+	// skel.uniqueMonsterTRN = std::make_unique<uint8_t[]>(256); //TODO: this code should be done only once when initializing a monster
+	// std::copy(SkeletonTrn.begin(), SkeletonTrn.end(), skel.uniqueMonsterTRN.get());
 
 	// AI
-	skel.ai = MonsterAIID::SkeletonRanged; // TODO: add custom AI here
-	// skel.ai = MonsterAIID::Golem;
+	skel.ai = MonsterAIID::SkeletonMelee; // TODO: add custom AI here
 
-	// TODO: I have a feeling that after being hit, skeleton starts to use GolumAI - check this theory.
-	// 		 Actualy if we'll have a lash for golem, we can use it's AI for melee summons.
+	// TODO: Actualy if we'll have a lash for golem, we can use it's AI for melee summons.
 	//		 It will not work for ranged summons though.
 
     OnSummonSpawn(skel, static_cast<Direction>((SkeletonSpawningSlot[player.getId()] + 1) % 8)); // scrolling through directions for next spawned skeleton
@@ -100,7 +124,7 @@ void KillMySummonedSkeleton(Monster& skel)
 
 Monster& GetSkeletonSummon(int skeletonIndex, int playerId) // skeleton index among skeleton summons
 {
-    int monsterIndex = playerId * (1 + MAX_SKELETONS) + 1 + skeletonIndex;  // + 1 to skip golems
+    int monsterIndex = MAX_PLRS + playerId * MAX_SKELETONS  + skeletonIndex; // +MAX_PLRS to skip golems 
     Monster& skeleton =  Monsters[monsterIndex];
     return skeleton;
 }

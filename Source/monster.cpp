@@ -49,6 +49,8 @@
 #include "utils/str_cat.hpp"
 #include "utils/utf8.hpp"
 
+#include "pd1/summons.h"
+
 #ifdef _DEBUG
 #include "debug.h"
 #endif
@@ -1090,7 +1092,7 @@ void MonsterAttackMonster(Monster &attacker, Monster &target, int hper, int mind
 	ApplyMonsterDamage(DamageType::Physical, target, dam);
 
 	if (attacker.isPlayerMinion()) {
-		size_t playerId = attacker.getId();
+		size_t playerId = GetSummonOwnerId(attacker.getId());  // PD1: allows summons to bring exp to player. WORKS ONLY WITH MELEE DAMAGE
 		const Player &player = Players[playerId];
 		target.tag(player);
 	}
@@ -3300,7 +3302,7 @@ void InitLevelMonsters()
 void GetLevelMTypes()
 {
 	AddMonsterType(MT_GOLEM, PLACE_SPECIAL);
-	AddMonsterType(MT_RSKELAX, PLACE_SPECIAL); // PD1 - summoned skeleton
+	AddMonsterType(SKELETON_MINION_TYPE, PLACE_SPECIAL); // PD1 - summoned skeleton
 	if (currlevel == 16) {
 		AddMonsterType(MT_ADVOCATE, PLACE_SCATTER);
 		AddMonsterType(MT_RBLACK, PLACE_SCATTER);
@@ -3542,14 +3544,10 @@ void WeakenNaKrul()
 void InitGolems() // PD1 - TODO: rename to InitSummons()
 {
 	if (!setlevel) {
-		for (int i = 0; i < MAX_PLRS; i++) {
+		for (int i = 0; i < MAX_PLRS; i++)
 			AddMonster(GolemHoldingCell, Direction::South, 0, false);
-
-			// PD1 - init summoned skeletons - 2 units
-			AddMonster(GolemHoldingCell, Direction::South, 1, false); 
-			AddMonster(GolemHoldingCell, Direction::South, 1, false);
-			AddMonster(GolemHoldingCell, Direction::South, 1, false);
-		}
+		
+		InitSkeletonSummons(); // PD1
 	}
 }
 
@@ -3617,16 +3615,15 @@ void InitMonsters()
 void SetMapMonsters(const uint16_t *dunData, Point startPosition)
 {
 	AddMonsterType(MT_GOLEM, PLACE_SPECIAL);
-	AddMonsterType(MT_RSKELAX, PLACE_SPECIAL); // PD1 - summoned skeletons. WHY 2ND TIME???
-	if (setlevel)
-		for (int i = 0; i < MAX_PLRS; i++) {
+	AddMonsterType(SKELETON_MINION_TYPE, PLACE_SPECIAL); // PD1 - summoned skeletons. WHY 2ND TIME???
+	if (setlevel) {
+		for (int i = 0; i < MAX_PLRS; i++) 
 			AddMonster(GolemHoldingCell, Direction::South, 0, false);
 
-			// PD1 - summoned skeletons. 2 units
-			AddMonster(GolemHoldingCell, Direction::South, 1, false); 
-			AddMonster(GolemHoldingCell, Direction::South, 1, false);
-			AddMonster(GolemHoldingCell, Direction::South, 1, false);
-		}
+		// PD1 - summoned skeletons
+		InitSkeletonSummons();
+		
+	}
 
 	if (setlevel && setlvlnum == SL_VILEBETRAYER) {
 		AddMonsterType(UniqueMonsterType::Lazarus, PLACE_UNIQUE);
@@ -3833,7 +3830,7 @@ void M_StartHit(Monster &monster, const Player &player, int dam)
 void MonsterDeath(Monster &monster, Direction md, bool sendmsg)
 {
 	if (!monster.isPlayerMinion())
-		AddPlrMonstExper(monster.level(sgGameInitInfo.nDifficulty), monster.exp(sgGameInitInfo.nDifficulty), monster.whoHit);
+		AddPlrMonstExper(monster.level(sgGameInitInfo.nDifficulty), monster.exp(sgGameInitInfo.nDifficulty), monster.whoHit); //PD1 todo: whoHit defines if player will get exp or not
 
 	MonsterKillCounts[monster.type().type]++;
 	monster.hitPoints = 0;

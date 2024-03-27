@@ -268,7 +268,7 @@ bool MonsterMHit(const Player &player, int monsterId, int mindam, int maxdam, in
 	} else {
 		if (monster.mode != MonsterMode::Petrified && missileData.isArrow() && HasAnyOf(player._pIFlags, ItemSpecialEffect::Knockback))
 			M_GetKnockback(monster);
-		if (monster.type().type != MT_GOLEM)
+		if (monster.type().type != MT_GOLEM) // PD1 Notice: Looks like golem is immune to missiles. We can do the same for other summons or maybe not :)
 			M_StartHit(monster, player, dam);
 	}
 
