@@ -657,7 +657,18 @@ void UpdateEnemy(Monster &monster)
 		        && (otherMonster.flags & MFLAG_GOLEM) == 0)) {
 			continue;
 		}
+
 		const bool sameroom = dTransVal[position.x][position.y] == dTransVal[otherMonster.position.tile.x][otherMonster.position.tile.y];
+
+		// PD1: AI vision distance for summons
+		if (monster.isPlayerMinion()) {
+			const Player &owner = Players[GetSummonOwnerId(monster.getId())];
+			const int ownerDist = owner.position.tile.WalkingDistance(position);
+			if (!sameroom || dist > 8 || ownerDist > 12)
+				continue;  
+		}
+		//PD1 end
+
 		if ((sameroom && !bestsameroom)
 		    || ((sameroom || !bestsameroom) && dist < bestDist)
 		    || (menemy == -1)) {
@@ -1285,7 +1296,7 @@ bool MonsterRangedAttack(Monster &monster)
 				    monster.enemyPosition,
 				    monster.direction,
 				    missileType,
-				    TARGET_PLAYERS, // monster.isPlayerMinion() ? TARGET_MONSTERS : TARGET_PLAYERS,  // PD1 will crash
+				    TARGET_PLAYERS, // monster.isPlayerMinion() ? TARGET_MONSTERS : TARGET_PLAYERS,  // PD1 will not work
 				    monster,
 				    monster.var2,
 				    0);
@@ -4013,7 +4024,7 @@ bool Walk(Monster &monster, Direction md)
 	return true;
 }
 
-void GolumAi(Monster &golem) // TODO: PD1 - golem AI
+void GolumAi(Monster &golem) // PD1 - golem AI
 {
 	if (golem.position.tile.x == 1 && golem.position.tile.y == 0) {
 		return;
@@ -4029,6 +4040,22 @@ void GolumAi(Monster &golem) // TODO: PD1 - golem AI
 	if (golem.mode == MonsterMode::MeleeAttack) {
 		return;
 	}
+
+	// PD1: Returning golem to the owner
+	const Player &owner = Players[golem.getId()];
+	const int ownerDist = owner.position.tile.WalkingDistance(golem.position.tile);
+
+	if (ownerDist >= 12)
+		golem.flags |= MFLAG_SUMMON_RETURNS;
+	if (ownerDist <= 5)
+		golem.flags &= ~MFLAG_SUMMON_RETURNS;
+
+	if ((golem.flags & MFLAG_SUMMON_RETURNS) != 0) {
+		Direction ownerDirection = GetDirection(golem.position.tile, owner.position.tile);
+		if (RandomWalk(golem, ownerDirection))
+		return;
+	}
+	// PD1 end
 
 	if ((golem.flags & MFLAG_NO_ENEMY) == 0) {
 		auto &enemy = Monsters[golem.enemy];
@@ -4063,7 +4090,8 @@ void GolumAi(Monster &golem) // TODO: PD1 - golem AI
 	if (golem.pathCount > 8)
 		golem.pathCount = 5;
 
-	if (RandomWalk(golem, Players[golem.getId()]._pdir))
+
+	if (ownerDist <= 6 && RandomWalk(golem, Players[golem.getId()]._pdir)) //PD1: {ownerDist <= 6}
 		return;
 
 	Direction md = Left(golem.direction);

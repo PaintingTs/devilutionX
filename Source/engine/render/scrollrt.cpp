@@ -326,7 +326,7 @@ void DrawMonster(const Surface &out, Point tilePosition, Point targetBufferPosit
 
 	// PD1: Infravision for players summons (minions)
 	if (monster.isPlayerMinion())
-		trn = GetSummonTrnOrNull(monster, LightTableIndex);
+		trn = GetSummonTRNOrNull(monster, LightTableIndex);
 	// PD1 end
 
 	if (trn != nullptr)

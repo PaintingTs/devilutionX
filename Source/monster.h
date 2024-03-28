@@ -50,6 +50,9 @@ enum monster_flag : uint16_t {
 	MFLAG_BERSERK         = 1 << 11,
 	MFLAG_NOLIFESTEAL     = 1 << 12,
 	// clang-format on
+
+	//PD1: flag for summon returns, while it's true - summon is heading towards it's owner
+	MFLAG_SUMMON_RETURNS  = 1 << 13,
 };
 
 /** Indexes from UniqueMonstersData array for special unique monsters (usually quest related) */

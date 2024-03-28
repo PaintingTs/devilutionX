@@ -56,14 +56,16 @@ void InitSkeletonSummons()
 
 } 
 
-const uint8_t* GetSummonTrnOrNull(const Monster &monster, int lightTableIndex)
+const uint8_t* GetSummonTRNOrNull(const Monster &monster, int lightTableIndex)
 {
-    if (monster.isPlayerMinion() && monster.type().type == SKELETON_MINION_TYPE) {
-        if (lightTableIndex > 7)
-            return GetPauseTRN();
+	if (!monster.isPlayerMinion())
+		return nullptr;
 
+	if (lightTableIndex > 7)
+		return GetPauseTRN();
+
+    if (monster.type().type == SKELETON_MINION_TYPE)
         return SkeletonTrn.data();
-    }
     
     return nullptr;
 }
@@ -79,7 +81,8 @@ int SkeletonSpawningSlot[MAX_PLRS] = {0};
 
 void SpawnSkeletonSummon(Player &player, Monster &skel, Point position, Missile &missile)
 {
-	skel.occupyTile(position, false);
+	// TODO: BUG: spawning a skeleton on a corpse causes grame to break
+i	skel.occupyTile(position, false);
 	skel.position.tile = position;
 	skel.position.future = position;
 	skel.position.old = position;
@@ -88,9 +91,10 @@ void SpawnSkeletonSummon(Player &player, Monster &skel, Point position, Missile 
 	skel.hitPoints = skel.maxHitPoints;
 	skel.armorClass = 25;
 	skel.toHit = 5 * (missile._mispllvl + 8) + 2 * player.getCharacterLevel();
-	skel.minDamage = 2 * (missile._mispllvl + 4);
-	skel.maxDamage = 2 * (missile._mispllvl + 8);
+	skel.minDamage = 1 * (missile._mispllvl + 4);
+	skel.maxDamage = 1 * (missile._mispllvl + 8);
 	skel.flags |= MFLAG_GOLEM;
+	skel.flags |= MFLAG_TARGETS_MONSTER;
 
 	// visual apperiance (might be usfull later)
 	// skel.uniqueMonsterTRN = std::make_unique<uint8_t[]>(256); //TODO: this code should be done only once when initializing a monster
@@ -98,9 +102,6 @@ void SpawnSkeletonSummon(Player &player, Monster &skel, Point position, Missile 
 
 	// AI
 	skel.ai = MonsterAIID::SkeletonMelee; // TODO: add custom AI here
-
-	// TODO: Actualy if we'll have a lash for golem, we can use it's AI for melee summons.
-	//		 It will not work for ranged summons though.
 
     OnSummonSpawn(skel, static_cast<Direction>((SkeletonSpawningSlot[player.getId()] + 1) % 8)); // scrolling through directions for next spawned skeleton
 
