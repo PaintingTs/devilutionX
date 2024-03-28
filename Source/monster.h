@@ -567,6 +567,11 @@ int encode_enemy(Monster &monster);
 void decode_enemy(Monster &monster, int enemyId);
 
 //PD1: exposing some of the functionality for summons
-void OnSummonSpawn(Monster &monster, Direction md);
+void SkeletonAi(Monster &monster);
+void UpdateEnemy(Monster &monster);
+void StartSpecialStand(Monster &monster, Direction md);
+bool RandomWalk2(Monster &monster, Direction md);
+void AiDelay(Monster &monster, int len);
+//PD1 end
 
 } // namespace devilution

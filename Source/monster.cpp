@@ -66,7 +66,7 @@ size_t ActiveMonsterCount;
 int MonsterKillCounts[NUM_MTYPES];
 bool sgbSaveSoundOn;
 
-namespace {
+// namespace { //PD1 removing anon namespace
 
 constexpr int NightmareToHitBonus = 85;
 constexpr int HellToHitBonus = 120;
@@ -660,7 +660,7 @@ void UpdateEnemy(Monster &monster)
 
 		const bool sameroom = dTransVal[position.x][position.y] == dTransVal[otherMonster.position.tile.x][otherMonster.position.tile.y];
 
-		// PD1: AI vision distance for summons
+		// PD1: AI vision distance for summons (not working)
 		if (monster.isPlayerMinion()) {
 			const Player &owner = Players[GetSummonOwnerId(monster.getId())];
 			const int ownerDist = owner.position.tile.WalkingDistance(position);
@@ -3032,7 +3032,10 @@ void (*AiProc[])(Monster &monster) = {					// PD1 idea: add custom AI here for s
 	/*MonsterAIID::ArchLich       */ &AiRanged,
 	/*MonsterAIID::Psychorb       */ &AiRanged,
 	/*MonsterAIID::Necromorb      */ &AiRanged,
-	/*MonsterAIID::BoneDemon      */ &AiRangedAvoidance
+	/*MonsterAIID::BoneDemon      */ &AiRangedAvoidance,
+
+	//PD1
+	/*MonsterAIID::SkeletonSummon */ &SkeletonSummonAi,
 };
 
 bool IsRelativeMoveOK(const Monster &monster, Point position, Direction mdir)
@@ -3164,7 +3167,7 @@ void EnsureMonsterIndexIsActive(size_t monsterId)
 	}
 }
 
-} // namespace
+// } // namespace
 
 size_t AddMonsterType(_monster_id type, placeflag placeflag)
 {
@@ -4042,7 +4045,7 @@ void GolumAi(Monster &golem) // PD1 - golem AI
 	}
 
 	// PD1: Returning golem to the owner
-	const Player &owner = Players[golem.getId()];
+	const Player &owner = Players[GetSummonOwnerId(golem.getId())];
 	const int ownerDist = owner.position.tile.WalkingDistance(golem.position.tile);
 
 	if (ownerDist >= 12)
@@ -4052,7 +4055,7 @@ void GolumAi(Monster &golem) // PD1 - golem AI
 
 	if ((golem.flags & MFLAG_SUMMON_RETURNS) != 0) {
 		Direction ownerDirection = GetDirection(golem.position.tile, owner.position.tile);
-		if (RandomWalk(golem, ownerDirection))
+		if (RandomWalk2(golem, ownerDirection))
 		return;
 	}
 	// PD1 end
@@ -4091,7 +4094,7 @@ void GolumAi(Monster &golem) // PD1 - golem AI
 		golem.pathCount = 5;
 
 
-	if (ownerDist <= 6 && RandomWalk(golem, Players[golem.getId()]._pdir)) //PD1: {ownerDist <= 6}
+	if (ownerDist <= 6 && RandomWalk2(golem, owner._pdir)) //PD1: {ownerDist <= 6}
 		return;
 
 	Direction md = Left(golem.direction);
@@ -4110,7 +4113,7 @@ void DeleteMonsterList()
 		if (!golem.isInvalid)
 			continue;
 
-		golem.position.tile = GolemHoldingCell;
+		golem.position.tile = GolemHoldingCell;  // PD1 - todo add clearing for other monsters
 		golem.position.future = { 0, 0 };
 		golem.position.old = { 0, 0 };
 		golem.isInvalid = false;
@@ -4928,11 +4931,5 @@ void Monster::occupyTile(Point position, bool isMoving) const
 	dMonster[position.x][position.y] = isMoving ? -id : id;
 }
 
-//PD1
-void OnSummonSpawn(Monster &monster, Direction md)
-{
-	StartSpecialStand(monster, md);
-	UpdateEnemy(monster);
-}
 
 } // namespace devilution

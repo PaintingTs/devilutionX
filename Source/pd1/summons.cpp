@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "engine/path.h"
+#include "engine/random.hpp"
 #include "engine/trn.hpp"
 #include "monstdat.h"
 #include "player.h"
@@ -37,13 +38,18 @@ constexpr std::array<uint8_t, 256> SkeletonTrn = []() constexpr
 }();
 
 
-size_t GetSummonOwnerId(size_t summonId)
+size_t GetSummonOwnerId(size_t summonId) // example: g0 g1 g2 g3 | s0 s0 s0 s1 s1 s1 s2 s2 s2 s3 s3 s3 | L0 L1 L2 L3
 {
+	size_t summonIndex = summonId;
 	if (summonId < MAX_PLRS)
 		return summonId;
 
-	if (summonId < MAX_PLRS * (MAX_SKELETONS + 1))
-		return (summonId - MAX_PLRS) / MAX_SKELETONS; // example: g0 g1 g2 g3 s0 s0 s0 s1 s1 s1 s2 s2 s2
+	summonIndex -= MAX_PLRS;
+
+	if (summonIndex < MAX_PLRS * MAX_SKELETONS)
+		return summonIndex / MAX_SKELETONS;
+
+	summonIndex -= MAX_PLRS * MAX_SKELETONS;
 
 	assert("Unreachable");
 	return 0;
@@ -82,10 +88,11 @@ int SkeletonSpawningSlot[MAX_PLRS] = {0};
 void SpawnSkeletonSummon(Player &player, Monster &skel, Point position, Missile &missile)
 {
 	// TODO: BUG: spawning a skeleton on a corpse causes grame to break
-i	skel.occupyTile(position, false);
+	skel.occupyTile(position, false);
 	skel.position.tile = position;
 	skel.position.future = position;
 	skel.position.old = position;
+	skel.position.last = position;
 	skel.pathCount = 0;
 	skel.maxHitPoints = 2 * (100 * missile._mispllvl + player._pMaxMana / 3);
 	skel.hitPoints = skel.maxHitPoints;
@@ -101,9 +108,10 @@ i	skel.occupyTile(position, false);
 	// std::copy(SkeletonTrn.begin(), SkeletonTrn.end(), skel.uniqueMonsterTRN.get());
 
 	// AI
-	skel.ai = MonsterAIID::SkeletonMelee; // TODO: add custom AI here
+	skel.ai = MonsterAIID::SkeletonSummon; // TODO: add custom AI here
 
-    OnSummonSpawn(skel, static_cast<Direction>((SkeletonSpawningSlot[player.getId()] + 1) % 8)); // scrolling through directions for next spawned skeleton
+    StartSpecialStand(skel, static_cast<Direction>((SkeletonSpawningSlot[player.getId()] + 1) % 8)); // scrolling through directions for next spawned skeleton
+	UpdateEnemy(skel);
 
 	if (&player == MyPlayer) {
 		/* NetSendCmdGolem(             //TODO: differnt type of command
@@ -123,10 +131,11 @@ void KillMySummonedSkeleton(Monster& skel)
 	M_StartKill(skel, *MyPlayer);
 }
 
-Monster& GetSkeletonSummon(int skeletonIndex, int playerId) // skeleton index among skeleton summons
+Monster& GetSkeletonSummon(int playerId) // skeleton index among skeleton summons
 {
-    int monsterIndex = MAX_PLRS + playerId * MAX_SKELETONS  + skeletonIndex; // +MAX_PLRS to skip golems 
-    Monster& skeleton =  Monsters[monsterIndex];
+	int skeletonIndex = SkeletonSpawningSlot[playerId];
+    int monsterIndex = MAX_PLRS + playerId * MAX_SKELETONS + skeletonIndex; // +MAX_PLRS to skip golems 
+    Monster& skeleton = Monsters[monsterIndex];
     return skeleton;
 }
 
@@ -147,7 +156,9 @@ void AddSkeletonSummon(Missile &missile, AddMissileParameter &parameter)
 
 
 	if (spawnPosition) {
-        Monster &skeleton = GetSkeletonSummon(SkeletonSpawningSlot[playerId], playerId);
+        Monster &skeleton = GetSkeletonSummon(playerId);
+
+		Log("!! Spawn position x:{}, y:{}", (*spawnPosition).x, (*spawnPosition).y);
 
         if (skeleton.position.tile != GolemHoldingCell && &player == MyPlayer)
 		    KillMySummonedSkeleton(skeleton);
@@ -163,6 +174,51 @@ void AddSkeletonSummon(Missile &missile, AddMissileParameter &parameter)
 				SkeletonSpawningSlot[playerId] = 0;
 		}
 
+	}
+}
+
+
+void SkeletonSummonAi(Monster &skeleton)
+{
+	if (skeleton.position.tile.x == 1 && skeleton.position.tile.y == 0) {
+		return;
+	}
+
+	if (IsAnyOf(skeleton.mode, MonsterMode::Death, MonsterMode::SpecialStand) || skeleton.isWalking()) {
+		return;
+	}
+
+	if ((skeleton.flags & MFLAG_TARGETS_MONSTER) == 0)
+		UpdateEnemy(skeleton);
+
+	if (skeleton.mode == MonsterMode::MeleeAttack) {
+		return;
+	}
+
+	const Player &owner = Players[GetSummonOwnerId(skeleton.getId())];
+	const int ownerDist = owner.position.tile.WalkingDistance(skeleton.position.tile);
+
+	if (ownerDist >= 12)
+		skeleton.flags |= MFLAG_SUMMON_RETURNS;
+	if (ownerDist <= 5)
+		skeleton.flags &= ~MFLAG_SUMMON_RETURNS;
+
+	if ((skeleton.flags & MFLAG_SUMMON_RETURNS) != 0) {
+		Direction ownerDirection = GetDirection(skeleton.position.tile, owner.position.tile);
+		if (RandomWalk2(skeleton, ownerDirection))
+		return;
+	}
+
+	SkeletonAi(skeleton);
+
+	if ((skeleton.flags & MFLAG_NO_ENEMY) != 0) {
+		Direction md = GetDirection(skeleton.position.tile, skeleton.position.last);
+		skeleton.direction = md;
+		if (static_cast<MonsterMode>(skeleton.var1) == MonsterMode::Delay || (GenerateRnd(100) >= 35 - 4 * skeleton.intelligence)) {
+			RandomWalk2(skeleton, md);
+		} else {
+			AiDelay(skeleton, 15 - 2 * skeleton.intelligence + GenerateRnd(10));
+		}
 	}
 }
 

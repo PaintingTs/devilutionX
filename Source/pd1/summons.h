@@ -12,5 +12,6 @@ void InitSkeletonSummons();
 const uint8_t* GetSummonTRNOrNull(const Monster &monster, int lightTableIndex);
 void AddSkeletonSummon(Missile &missile, AddMissileParameter &parameter);
 size_t GetSummonOwnerId(size_t summonId);
+void SkeletonSummonAi(Monster &skeleton);
 
 }

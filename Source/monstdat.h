@@ -53,6 +53,9 @@ enum class MonsterAIID : int8_t {
 	Psychorb,
 	Necromorb,
 	BoneDemon,
+
+	SkeletonSummon, //PD1 summon
+
 	Invalid = -1,
 };
 
