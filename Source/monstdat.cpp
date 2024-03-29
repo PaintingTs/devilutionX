@@ -419,6 +419,9 @@ tl::expected<MonsterAIID, std::string> ParseAiId(std::string_view value)
 	if (value == "Psychorb") return MonsterAIID::Psychorb;
 	if (value == "Necromorb") return MonsterAIID::Necromorb;
 	if (value == "BoneDemon") return MonsterAIID::BoneDemon;
+
+	if (value == "SkeletonSummon") return MonsterAIID::SkeletonSummon; // PD1
+
 	return tl::make_unexpected("Unknown enum value");
 }
 
@@ -436,6 +439,9 @@ tl::expected<monster_flag, std::string> ParseMonsterFlag(std::string_view value)
 	if (value == "NO_ENEMY") return MFLAG_NO_ENEMY;
 	if (value == "BERSERK") return MFLAG_BERSERK;
 	if (value == "NOLIFESTEAL") return MFLAG_NOLIFESTEAL;
+
+	if (value == "SUMMON_RETURNS") return MFLAG_SUMMON_RETURNS; // PD1
+
 	return tl::make_unexpected("Unknown enum value");
 }
 

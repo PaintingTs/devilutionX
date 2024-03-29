@@ -3843,10 +3843,11 @@ void M_StartHit(Monster &monster, const Player &player, int dam)
 
 void MonsterDeath(Monster &monster, Direction md, bool sendmsg)
 {
-	if (!monster.isPlayerMinion())
+	if (!monster.isPlayerMinion()) {
 		AddPlrMonstExper(monster.level(sgGameInitInfo.nDifficulty), monster.exp(sgGameInitInfo.nDifficulty), monster.whoHit); //PD1 todo: whoHit defines if player will get exp or not
+		MonsterKillCounts[monster.type().type]++; //PD1 fix: this line is now under if to not count dead summons in MonsterKillCounts
+	}
 
-	MonsterKillCounts[monster.type().type]++;
 	monster.hitPoints = 0;
 	monster.flags &= ~MFLAG_HIDDEN;
 	SetRndSeed(monster.rndItemSeed);
@@ -4108,7 +4109,7 @@ void GolumAi(Monster &golem) // PD1 - golem AI
 
 void DeleteMonsterList()
 {
-	for (int i = 0; i < MAX_PLRS; i++) {
+	for (size_t i = 0; i < MaxSummonsCount(); i++) {
 		auto &golem = Monsters[i];
 		if (!golem.isInvalid)
 			continue;
@@ -4119,7 +4120,7 @@ void DeleteMonsterList()
 		golem.isInvalid = false;
 	}
 
-	for (size_t i = MAX_PLRS; i < ActiveMonsterCount;) {
+	for (size_t i = MaxSummonsCount(); i < ActiveMonsterCount;) {
 		if (Monsters[ActiveMonsters[i]].isInvalid) {
 			if (pcursmonst == static_cast<int>(ActiveMonsters[i])) // Unselect monster if player highlighted it
 				pcursmonst = -1;

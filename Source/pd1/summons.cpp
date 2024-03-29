@@ -37,8 +37,13 @@ constexpr std::array<uint8_t, 256> SkeletonTrn = []() constexpr
     return arr;
 }();
 
+// example: g0 g1 g2 g3 | s0 s0 s0 s1 s1 s1 s2 s2 s2 s3 s3 s3 | L0 L1 L2 L3
+size_t MaxSummonsCount()
+{
+	return MAX_PLRS + MAX_PLRS * MAX_SKELETONS;
+}
 
-size_t GetSummonOwnerId(size_t summonId) // example: g0 g1 g2 g3 | s0 s0 s0 s1 s1 s1 s2 s2 s2 s3 s3 s3 | L0 L1 L2 L3
+size_t GetSummonOwnerId(size_t summonId)
 {
 	size_t summonIndex = summonId;
 	if (summonId < MAX_PLRS)
@@ -61,6 +66,18 @@ void InitSkeletonSummons()
 		AddMonster(GolemHoldingCell, Direction::South, SKELETON_TYPE_INDEX, false); 
 
 } 
+
+void DeltaLoadSummon(Monster& monster)
+{
+	assert(monster.isPlayerMinion());
+
+	if (monster.type().type == MT_GOLEM)
+		GolumAi(monster);
+	else if (monster.type().type == SKELETON_MINION_TYPE)
+		SkeletonSummonAi(monster);
+
+	monster.flags |= (MFLAG_TARGETS_MONSTER | MFLAG_GOLEM);
+}
 
 const uint8_t* GetSummonTRNOrNull(const Monster &monster, int lightTableIndex)
 {
@@ -87,12 +104,12 @@ int SkeletonSpawningSlot[MAX_PLRS] = {0};
 
 void SpawnSkeletonSummon(Player &player, Monster &skel, Point position, Missile &missile)
 {
-	// TODO: BUG: spawning a skeleton on a corpse causes grame to break
+	// TODO: BUG: spawning a skeleton on a corpse causes game to break
 	skel.occupyTile(position, false);
 	skel.position.tile = position;
 	skel.position.future = position;
 	skel.position.old = position;
-	skel.position.last = position;
+	//skel.position.last = position;
 	skel.pathCount = 0;
 	skel.maxHitPoints = 2 * (100 * missile._mispllvl + player._pMaxMana / 3);
 	skel.hitPoints = skel.maxHitPoints;
@@ -100,8 +117,7 @@ void SpawnSkeletonSummon(Player &player, Monster &skel, Point position, Missile 
 	skel.toHit = 5 * (missile._mispllvl + 8) + 2 * player.getCharacterLevel();
 	skel.minDamage = 1 * (missile._mispllvl + 4);
 	skel.maxDamage = 1 * (missile._mispllvl + 8);
-	skel.flags |= MFLAG_GOLEM;
-	skel.flags |= MFLAG_TARGETS_MONSTER;
+	skel.flags |= (MFLAG_GOLEM | MFLAG_TARGETS_MONSTER);
 
 	// visual apperiance (might be usfull later)
 	// skel.uniqueMonsterTRN = std::make_unique<uint8_t[]>(256); //TODO: this code should be done only once when initializing a monster
@@ -157,8 +173,6 @@ void AddSkeletonSummon(Missile &missile, AddMissileParameter &parameter)
 
 	if (spawnPosition) {
         Monster &skeleton = GetSkeletonSummon(playerId);
-
-		Log("!! Spawn position x:{}, y:{}", (*spawnPosition).x, (*spawnPosition).y);
 
         if (skeleton.position.tile != GolemHoldingCell && &player == MyPlayer)
 		    KillMySummonedSkeleton(skeleton);

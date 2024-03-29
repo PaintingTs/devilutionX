@@ -46,6 +46,8 @@
 #include "utils/str_cat.hpp"
 #include "utils/utf8.hpp"
 
+#include "pd1/summons.h"  // PD1
+
 #define ValidateField(logValue, condition)                    \
 	do {                                                      \
 		if (!(condition)) {                                   \
@@ -1766,7 +1768,7 @@ size_t OnMonstDeath(const TCmd *pCmd, Player &player)
 	return sizeof(message);
 }
 
-size_t OnKillGolem(const TCmd *pCmd, Player &player)
+size_t OnKillGolem(const TCmd *pCmd, Player &player) // PD1: todo check this
 {
 	const auto &message = *reinterpret_cast<const TCmdLoc *>(pCmd);
 	const Point position { message.x, message.y };
@@ -1785,7 +1787,7 @@ size_t OnKillGolem(const TCmd *pCmd, Player &player)
 	return sizeof(message);
 }
 
-size_t OnAwakeGolem(const TCmd *pCmd, Player &player)
+size_t OnAwakeGolem(const TCmd *pCmd, Player &player) // PD1: todo check this
 {
 	const auto &message = *reinterpret_cast<const TCmdGolem *>(pCmd);
 	const Point position { message._mx, message._my };
@@ -2729,9 +2731,8 @@ void DeltaLoadLevel()
 				decode_enemy(monster, deltaLevel.monster[i]._menemy);
 				if (monster.position.tile != Point { 0, 0 } && monster.position.tile != GolemHoldingCell)
 					monster.occupyTile(monster.position.tile, false);
-				if (monster.type().type == MT_GOLEM) {
-					GolumAi(monster);
-					monster.flags |= (MFLAG_TARGETS_MONSTER | MFLAG_GOLEM);
+				if (monster.isPlayerMinion()) {    //PD1 delta load logic for all summons
+					DeltaLoadSummon(monster);
 				} else {
 					M_StartStand(monster, monster.direction);
 				}
